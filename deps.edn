@@ -1,0 +1,9 @@
+{:paths ["src" "resources"]
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/core.async {:mvn/version "1.6.681"}
+        org.clj-http/clj-http {:mvn/version "3.12.3"}
+        org.java-websocket/Java-WebSocket {:mvn/version "1.5.4"}
+        reagent/reagent {:mvn/version "1.2.0"}
+        buddy/buddy-core {:mvn/version "1.11.0"}}
+ :aliases {:test {:extra-paths ["test"]
+                  :main-opts ["-m" "cognitect.test-runner"]}}}
