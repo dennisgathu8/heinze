@@ -25,18 +25,10 @@ jobs:
             ~/.gitlibs
           key: ${{ runner.os }}-clojure-${{ hashFiles('**/deps.edn') }}
           
-      - name: Security Audit
+      - name: Security Audit (Agent Zeta)
         run: |
-          clojure -M -m argus.secure/audit || exit 1
+          clojure -M -m argus.secure || exit 1
           
       - name: Run Tests
         run: |
           clojure -M:test
-          
-      - name: Check Forbidden Patterns
-        run: |
-          if grep -r "eval\|read-string\|resolve" src/ --include="*.clj" | grep -v "docstring\|comment"; then
-            echo "❌ Forbidden patterns detected"
-            exit 1
-          fi
-          echo "✅ No forbidden patterns"

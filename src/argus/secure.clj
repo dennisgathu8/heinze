@@ -1,6 +1,7 @@
 (ns argus.secure
   (:require [clojure.java.io :as io]
-            [argus.util :as util]))
+            [argus.util :as util])
+  (:gen-class))
 
 (def forbidden-tokens #{(str "ev" "al") (str "read" "-" "string") (str "res" "olve") (str "load" "-" "string")})
 
@@ -43,3 +44,14 @@
   ;; In a real deployment, we would check JAR hashes here.
   ;; For now, we simulate success.
   (println "✅ Integrity Verified."))
+
+(defn -main [& args]
+  (try
+    (audit-source!)
+    (verify-integrity!)
+    (System/exit 0)
+    (catch Exception e
+      (println "❌ SECURITY AUDIT FAILED:" (.getMessage e))
+      (when-let [d (ex-data e)]
+        (println "   Details:" d))
+      (System/exit 1))))
