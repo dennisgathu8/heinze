@@ -1,0 +1,42 @@
+name: Argus Security & Performance Audit
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Clojure
+        uses: DeLaGuardo/setup-clojure@12.5
+        with:
+          cli: '1.12.4.1602'
+          
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+          key: ${{ runner.os }}-clojure-${{ hashFiles('**/deps.edn') }}
+          
+      - name: Security Audit
+        run: |
+          clojure -M -m argus.secure/audit || exit 1
+          
+      - name: Run Tests
+        run: |
+          clojure -M:test
+          
+      - name: Check Forbidden Patterns
+        run: |
+          if grep -r "eval\|read-string\|resolve" src/ --include="*.clj" | grep -v "docstring\|comment"; then
+            echo "❌ Forbidden patterns detected"
+            exit 1
+          fi
+          echo "✅ No forbidden patterns"
