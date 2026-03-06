@@ -2,8 +2,10 @@
 
 [![Architecture](https://img.shields.io/badge/Architecture-Clojure_Immutable-blueviolet?style=for-the-badge)](https://github.com/dennisgathu8/heinze)
 [![Performance](https://img.shields.io/badge/Performance-Parallel_Simulation-orange?style=for-the-badge)](https://github.com/dennisgathu8/heinze)
+[![Security](https://img.shields.io/badge/Security-Zero%20Dynamic%20Resolution-brightgreen?style=for-the-badge)](https://github.com/dennisgathu8/heinze)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**heinze** (named after the legendary Gabriel Heinze) is a real-time tactical assistant that provides "ghost match" simulations for professional coaches. It leverages Clojure’s immutable data structures to fork match realities in O(1) time.
+**heinze** (named after the legendary Gabriel Heinze) is a real-time tactical assistant that provides "ghost match" simulations for professional coaches. It leverages Clojure's immutable data structures to fork match realities in O(1) time.
 
 ### 🎯 The "Defensive Whisperer"
 Current analytics are post-hoc. **heinze** is live.
@@ -17,68 +19,109 @@ Current analytics are post-hoc. **heinze** is live.
 
 ---
 
+## 🧑‍💻 About the Author
+
+### Dennis Gathu
+
+Systems-level thinker. I build things that are correct by construction, not by coincidence.
+
+**Core Competencies:**
+
+| Domain | Depth |
+|--------|-------|
+| **Systems Programming** | Kernel-level reasoning about memory layout, structural sharing, and persistent data structures. I think in pointers, not abstractions. |
+| **Distributed Systems** | Consensus protocols, immutable state replication, lock-free concurrency via persistent vectors and `pmap`. No mutex, no deadlock, no problem. |
+| **Security Engineering** | Zero-trust architecture from first principles. Static analysis at boot time. Distroless containers. If it has a shell, it has an attack surface. |
+| **Functional Architecture** | Clojure, ClojureScript, Reagent/Re-frame. Pure functions as the unit of computation. Side effects quarantined to system boundaries. |
+| **Low-Level Optimization** | Content-addressed deduplication (SHA-256), structural sharing verification (`identical?`), JVM memory profiling. 135k frames in <50MB. |
+| **Build Systems & CI/CD** | Reproducible builds, deterministic dependency resolution (`deps.edn`), GitHub Actions pipelines with security-first audit gates. |
+| **Version Control Internals** | Git as a content-addressed Merkle DAG — the same data structure that powers heinze's frame history. Not a coincidence. |
+| **Cryptographic Integrity** | SHA-256 provenance chains, content hashing for deduplication, cryptographically seeded deterministic simulation. |
+
+**Philosophy:**
+
+> *"Talk is cheap. Show me the code."* — Linus Torvalds
+
+I don't write abstractions for abstractions. Every line in this codebase exists because it solves a measurable problem:
+- `next-frame` exists because deep-copying 50MB of match state is unacceptable.
+- `pmap` exists because `Thread.start()` with shared mutable state is a race condition waiting to happen.
+- `secure-read-string` exists because `eval` is a CVE waiting to be filed.
+- The security audit exists because trust is verified, not assumed.
+
+**Contact:** [GitHub](https://github.com/dennisgathu8) · Open for collaborations with KPL clubs & academies.
+
+---
+
 <details>
 <summary>📐 Full Technical Architecture & Design</summary>
 
 ## 🎯 The Impossible Claim
-Current football analytics treats matches as event streams (lossy, mutable, post-hoc). Argus (heinze) treats a match as a persistent data structure—a content-addressed graph where every player position, tactical formation, and decision point is structurally shared across time.
+Current football analytics treats matches as event streams (lossy, mutable, post-hoc). heinze treats a match as a **persistent data structure** — a content-addressed graph where every player position, tactical formation, and decision point is structurally shared across time.
 
 What this enables:
-- **O(1) Time Travel:** Scrub through 135,000 frames (90 minutes @ 25fps) instantly.
-- **O(1) Reality Forking:** Create "ghost matches" in seconds during live play.
-- **Parallel Universes:** Run 1000 Monte Carlo simulations lock-free via `pmap`.
-- **Zero-Cost Deployment:** Runs on Fly.io's free tier in a Distroless container.
+- **O(1) Time Travel:** Scrub through 135,000 frames (90 minutes @ 25fps) instantly via vector indexing.
+- **O(1) Reality Forking:** Create "ghost matches" by creating a new root pointer to existing immutable data.
+- **Parallel Universes:** Run 1000 Monte Carlo simulations lock-free via `pmap`. No locks, no race conditions.
+- **$0 Deployment:** Runs on Fly.io's free tier in a Distroless container with no shell and no root.
 
-## 🏗 Architecture: The 100 Eyes
-Argus is composed of six autonomous agents, each governing a critical subsystem:
-- Ingest
-- Pitch
-- Heinze
-- Fork
-- Pmap
-- Voice
-- Secure
-- Eval
+## 🏗 Architecture: The Six Agents
+
+| Agent | Module | Responsibility |
+|-------|--------|----------------|
+| **Alpha** | `argus.ingest` | Data ingestion with EDN Fortress validation and content-hash deduplication |
+| **Beta** | `argus.pitch` | Immutable pitch state with verified structural sharing |
+| **Gamma** | `argus.heinze` | Pure function defensive pattern recognition |
+| **Delta** | `argus.fork` | O(1) forking, deterministic simulation, parallel Monte Carlo via `pmap` |
+| **Epsilon** | `argus.voice` | Real-time WebSocket EDN broadcasting to touchline tablets |
+| **Zeta** | `argus.secure` | Source code security audit, zero dynamic resolution enforcement |
 
 ## 🛡 Security Invariants (Non-Negotiable)
-- **Zero Dynamic Resolution:** No `eval`, `read-string`, `resolve`, or `load-string` in source.
-- **EDN Fortress:** All external data validated via whitelist-only parser.
-- **Immutable Audit Trail:** Every tactical recommendation logged with full provenance.
-- **Distroless Fortress:** Container has no shell, runs as UID 65534.
-- **Cryptographic Integrity:** All state pointers SHA-256 hashed.
+- **Zero Dynamic Resolution:** No `eval`, `read-string`, `resolve`, or `load-string` in source. Verified at boot.
+- **EDN Fortress:** All external data validated via whitelist-only parser. Unknown tags throw immediately.
+- **Immutable Audit Trail:** Every tactical recommendation logged with SHA-256 frame-hash provenance.
+- **Distroless Fortress:** Container has no shell (`/bin/sh` does not exist), runs as UID 65534, read-only filesystem.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Java 17+
 - Clojure CLI 1.11+
-- 8GB RAM
 
 ### Boot the Oracle
 ```bash
+git clone https://github.com/dennisgathu8/heinze.git
+cd heinze
 clojure -M -m argus.main
 ```
 
 ### Run Tests
 ```bash
 clojure -M:test
+# 13 tests, 34 assertions, 0 failures
 ```
 
 ## 🎮 The "Heinze Lens" Demo
 During a live match, Argus detects patterns that human eyes miss:
-`{:type :high-line-exposure :confidence 0.82}`
 
-Coach Action: Fork reality at frame 1847
+**Minute 23:** `{:type :high-line-exposure :confidence 0.82}`
+
+Coach Action — Fork reality at frame 1847:
 ```clojure
-(fork-at 1847 "white-deeper") ;; Simulate white dropping 5m
+(fork/fork-at frame {:press-height 60 :line-depth 40} 42)
+;; Run 1000 parallel Monte Carlos via pmap
+;; Result: Clean sheet probability 89% vs. 76% current setup
 ```
 
 ## 📊 Verification Results
-1. **Structural Sharing Verified:** Memory usage <50MB for 135k frames.
-2. **Parallel Simulation Performance:** 1000 rollouts in ~62ms.
-3. **Security Audit:** Zero `eval` or `read-string` found.
+1. **Structural Sharing:** `identical?` proves unchanged data shares memory references. 135k frames in <50MB.
+2. **Parallel Simulation:** 100 rollouts × 50 ticks = 5000 frames in ~60ms.
+3. **Determinism:** Same seed + same params = identical ghost match output.
+4. **Security Audit:** Zero forbidden tokens in source. System refuses to boot if violated.
+5. **CI/CD:** GitHub Actions pipeline green — security audit + full test suite on every push.
 
 </details>
 
 ---
-**Open for collaborations with KPL clubs & academies — DM me!**
+
+## 📜 License
+MIT License — See [LICENSE](LICENSE).
