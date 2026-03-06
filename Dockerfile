@@ -14,6 +14,7 @@ RUN clojure -T:build uber
 
 # Stage 2: Runtime (Distroless)
 FROM gcr.io/distroless/java17-debian12:nonroot
+WORKDIR /app
 COPY --from=jvm-builder /app/target/argus.jar /app/argus.jar
 EXPOSE 8080 8081
-CMD ["argus.jar"]
+CMD ["/app/argus.jar"]

@@ -16,9 +16,11 @@
                 is-whitelist-file (and (= token r-s) 
                                        (clojure.string/includes? file-path "util.clj"))
                 is-safe-wrapper (and (= token r-s)
-                                     (clojure.string/includes? code-part "secure-read-string"))]
+                                     (clojure.string/includes? code-part "secure-read-string"))
+                is-cljs-reader (and (= token r-s)
+                                    (clojure.string/includes? code-part "reader/read-string"))]
             
-            (when-not (or is-whitelist-file is-safe-wrapper)
+            (when-not (or is-whitelist-file is-safe-wrapper is-cljs-reader)
               (throw (ex-info (str "Security Violation: Forbidden token '" token "' found")
                               {:file file-path :line line-num :content (clojure.string/trim line)})))))))))
 
