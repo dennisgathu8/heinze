@@ -66,34 +66,51 @@ What this enables:
 - **Parallel Universes:** Run 1000 Monte Carlo simulations lock-free via `pmap`. No locks, no race conditions.
 - **$0 Deployment:** Runs on Fly.io's free tier in a Distroless container with no shell and no root.
 
-## 🏗 Architecture: The Six Agents
+## 🏗 Architecture: The Full Stack
 
-| Agent | Module | Responsibility |
+| Component | Tech Stack | Responsibility |
 |-------|--------|----------------|
-| **Alpha** | `argus.ingest` | Data ingestion with EDN Fortress validation and content-hash deduplication |
-| **Beta** | `argus.pitch` | Immutable pitch state with verified structural sharing |
-| **Gamma** | `argus.heinze` | Pure function defensive pattern recognition |
-| **Delta** | `argus.fork` | O(1) forking, deterministic simulation, parallel Monte Carlo via `pmap` |
-| **Epsilon** | `argus.voice` | Real-time WebSocket EDN broadcasting to touchline tablets |
-| **Zeta** | `argus.secure` | Source code security audit, zero dynamic resolution enforcement |
+| **Frontend UI** | Reagent (React 18), ClojureScript | Arsenal-themed tactical HUD. Connects via WebSocket, renders live frames and ghost alerts. |
+| **Agent Alpha** | `argus.ingest` | Data ingestion with EDN Fortress validation and content-hash deduplication. |
+| **Agent Beta** | `argus.pitch` | Immutable pitch state with verified structural sharing. |
+| **Agent Gamma** | `argus.heinze` | Pure function defensive pattern recognition. |
+| **Agent Delta** | `argus.fork` | O(1) forking, deterministic simulation, parallel Monte Carlo via `pmap`. |
+| **Agent Epsilon** | `argus.voice` | Real-time WebSocket EDN broadcasting to touchline tablets. |
+| **Agent Zeta** | `argus.secure` | Source code security audit, zero dynamic resolution enforcement. |
+| **Edge Proxy** | Fly.io Edge | TLS termination (`wss://`), auto-stop/start ($0 idle cost routing). |
 
 ## 🛡 Security Invariants (Non-Negotiable)
-- **Zero Dynamic Resolution:** No `eval`, `read-string`, `resolve`, or `load-string` in source. Verified at boot.
+- **Zero Dynamic Resolution:** No `eval`, `read-string`, `resolve`, or `load-string` in backend source. Verified at JVM boot.
 - **EDN Fortress:** All external data validated via whitelist-only parser. Unknown tags throw immediately.
 - **Immutable Audit Trail:** Every tactical recommendation logged with SHA-256 frame-hash provenance.
-- **Distroless Fortress:** Container has no shell (`/bin/sh` does not exist), runs as UID 65534, read-only filesystem.
+- **Distroless Fortress:** Production JVM runs in a Distroless container (no `/bin/sh`, UID 65534).
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Java 17+
 - Clojure CLI 1.11+
+- Node.js 20+ (for frontend development)
 
-### Boot the Oracle
+### Development Boot
 ```bash
 git clone https://github.com/dennisgathu8/heinze.git
 cd heinze
+
+# 1. Build the UI
+npm install
+npx shadow-cljs release app
+
+# 2. Boot the Edge Server
 clojure -M -m argus.main
+# Dashboard available at http://localhost:8080
+```
+
+### Production Deployment (Fly.io)
+We use a 3-stage Docker build: Node (CLJS compilation) → Clojure (Uberjar) → Distroless (Runtime).
+```bash
+fly launch --name heinze-oracle --region jnb
+fly deploy
 ```
 
 ### Run Tests
