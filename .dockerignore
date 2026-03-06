@@ -1,0 +1,16 @@
+.git
+.github
+.shadow-cljs
+.cpcache
+.clj-kondo
+.lsp
+node_modules
+target
+test
+walkthrough.md
+README.md
+CONTRIBUTING.md
+LICENSE
+package.json
+package-lock.json
+shadow-cljs.edn

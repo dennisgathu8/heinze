@@ -5,6 +5,8 @@
 [![Security](https://img.shields.io/badge/Security-Zero%20Dynamic%20Resolution-brightgreen?style=for-the-badge)](https://github.com/dennisgathu8/heinze)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
+🟢 **Live Tactical Dashboard:** [https://heinze-oracle.fly.dev](https://heinze-oracle.fly.dev)
+
 **heinze** (named after the legendary Gabriel Heinze) is a real-time tactical assistant that provides "ghost match" simulations for professional coaches. It leverages Clojure's immutable data structures to fork match realities in O(1) time.
 
 ### 🎯 The "Defensive Whisperer"

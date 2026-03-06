@@ -1,0 +1,29 @@
+{
+  "name": "argus",
+  "version": "1.0.0",
+  "description": "[![Architecture](https://img.shields.io/badge/Architecture-Clojure_Immutable-blueviolet?style=for-the-badge)](https://github.com/dennisgathu8/heinze) [![Performance](https://img.shields.io/badge/Performance-Parallel_Simulation-orange?style=for-the-badge)](https://github.com/dennisgathu8/heinze) [![Security](https://img.shields.io/badge/Security-Zero%20Dynamic%20Resolution-brightgreen?style=for-the-badge)](https://github.com/dennisgathu8/heinze) [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dennisgathu8/heinze.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dennisgathu8/heinze/issues"
+  },
+  "homepage": "https://github.com/dennisgathu8/heinze#readme",
+  "dependencies": {
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "shadow-cljs": "^2.26.0"
+  }
+}
