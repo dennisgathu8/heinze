@@ -15,7 +15,10 @@
         (if (or (= uri "/health") ;; Always public for Fly.io monitoring
                 (nil? allowed-ip)
                 (= allowed-ip client-ip))
-          (handler request)
+          (do
+            (when (not= uri "/health")
+              (println (str "✅ ALLOWED: " uri " | IP: " (or client-ip "local"))))
+            (handler request))
           (do
             (println (str "❌ BLOCKED: " uri " | Expected: " (or allowed-ip "N/A") " | Got: " (or client-ip "NONE")))
             {:status 403 :body "Forbidden: Unauthorized IP"}))))))
