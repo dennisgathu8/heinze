@@ -16,13 +16,13 @@
   (let [allowed-ip (System/getenv "ALLOWED_IP")
         client-ip (.getFieldValue handshake "fly-client-ip")]
     (if (or (nil? allowed-ip)
-            (empty? client-ip) ;; Likely local dev if header is missing
+            (empty? client-ip)
             (= allowed-ip client-ip))
       (do
         (swap! clients conj conn)
-        (println "New connection from authorized IP:" client-ip))
+        (println (str "✅ WS OPEN: Authorized IP: " (or client-ip "local"))))
       (do
-        (println "Blocked unauthorized WebSocket connection from IP:" client-ip)
+        (println (str "❌ WS BLOCKED: IP mismatch. Expected: " allowed-ip " | Got: " client-ip))
         (.close conn 4003 "Unauthorized IP")))))
 
 (defn on-close [conn code reason remote]

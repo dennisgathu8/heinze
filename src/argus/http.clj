@@ -7,14 +7,17 @@
 
 (defn wrap-ip-whitelist [handler]
   (let [allowed-ip (System/getenv "ALLOWED_IP")]
+    (when (nil? allowed-ip)
+      (println "⚠️ WARNING: ALLOWED_IP environment variable is not set. Security is wide open!"))
     (fn [request]
-      (if (or (nil? allowed-ip) ;; Allow all if not set (for local dev)
-              (= "localhost" (:server-name request))
-              (= allowed-ip (get-in request [:headers "fly-client-ip"])))
-        (handler request)
-        (do
-          (println "Blocked unauthorized request from IP:" (get-in request [:headers "fly-client-ip"]))
-          {:status 403 :body "Forbidden: Unauthorized IP"})))))
+      (let [client-ip (get-in request [:headers "fly-client-ip"])]
+        (if (or (nil? allowed-ip)
+                (= "localhost" (:server-name request))
+                (= allowed-ip client-ip))
+          (handler request)
+          (do
+            (println (str "❌ BLOCKED: IP mismatch. Expected: " allowed-ip " | Got: " client-ip))
+            {:status 403 :body "Forbidden: Unauthorized IP"}))))))
 
 (defn handler [request]
   (let [uri (:uri request)]
