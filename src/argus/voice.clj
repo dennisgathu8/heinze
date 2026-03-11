@@ -13,8 +13,17 @@
 ;; -----------------------------------------------------------------------------
 
 (defn on-open [conn handshake]
-  (swap! clients conj conn)
-  (println "New connection:" (.getRemoteSocketAddress conn)))
+  (let [allowed-ip (System/getenv "ALLOWED_IP")
+        client-ip (.getFieldValue handshake "fly-client-ip")]
+    (if (or (nil? allowed-ip)
+            (empty? client-ip) ;; Likely local dev if header is missing
+            (= allowed-ip client-ip))
+      (do
+        (swap! clients conj conn)
+        (println "New connection from authorized IP:" client-ip))
+      (do
+        (println "Blocked unauthorized WebSocket connection from IP:" client-ip)
+        (.close conn 4003 "Unauthorized IP")))))
 
 (defn on-close [conn code reason remote]
   (swap! clients disj conn)

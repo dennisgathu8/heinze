@@ -16,6 +16,9 @@ primary_region = 'jnb'
   min_machines_running = 0
   processes = ['app']
 
+[env]
+  ALLOWED_IP = "82.180.151.30"
+
 [[vm]]
   memory = '1gb'
   cpu_kind = 'shared'
