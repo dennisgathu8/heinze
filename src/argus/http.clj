@@ -7,21 +7,24 @@
 
 (defn wrap-ip-whitelist [handler]
   (let [allowed-ip (some-> (System/getenv "ALLOWED_IP") clojure.string/trim)]
-    (when (nil? allowed-ip)
-      (println "⚠️ WARNING: ALLOWED_IP environment variable is not set. Security is wide open!"))
     (fn [request]
       (let [uri (:uri request)
             client-ip (some-> (get-in request [:headers "fly-client-ip"]) clojure.string/trim)]
-        (if (or (= uri "/health") ;; Always public for Fly.io monitoring
+        (println (str "🔍 REQUEST: " uri " | Client IP: " (or client-ip "NONE") " | Allowed IP: " (or allowed-ip "NOT-SET")))
+        (if (or (= uri "/health")
                 (nil? allowed-ip)
                 (= allowed-ip client-ip))
+          (let [response (handler request)]
+            (-> response
+                (resp/header "Cache-Control" "no-store, no-cache, must-revalidate, proxy-revalidate")
+                (resp/header "Pragma" "no-cache")
+                (resp/header "Expires" "0")))
           (do
-            (when (not= uri "/health")
-              (println (str "✅ ALLOWED: " uri " | IP: " (or client-ip "local"))))
-            (handler request))
-          (do
-            (println (str "❌ BLOCKED: " uri " | Expected: " (or allowed-ip "N/A") " | Got: " (or client-ip "NONE")))
-            {:status 403 :body "Forbidden: Unauthorized IP"}))))))
+            (println (str "❌ BLOCKED: " uri " | Expected: " allowed-ip " | Got: " client-ip))
+            {:status 403 
+             :headers {"Content-Type" "text/plain" 
+                       "Cache-Control" "no-store"}
+             :body (str "Forbidden: Unauthorized IP (" (or client-ip "NONE") ")")}))))))
 
 (defn handler [request]
   (let [uri (:uri request)]
