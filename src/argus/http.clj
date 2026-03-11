@@ -6,17 +6,18 @@
 (defonce server-ref (atom nil))
 
 (defn wrap-ip-whitelist [handler]
-  (let [allowed-ip (System/getenv "ALLOWED_IP")]
+  (let [allowed-ip (some-> (System/getenv "ALLOWED_IP") clojure.string/trim)]
     (when (nil? allowed-ip)
       (println "⚠️ WARNING: ALLOWED_IP environment variable is not set. Security is wide open!"))
     (fn [request]
-      (let [client-ip (get-in request [:headers "fly-client-ip"])]
-        (if (or (nil? allowed-ip)
-                (= "localhost" (:server-name request))
+      (let [uri (:uri request)
+            client-ip (some-> (get-in request [:headers "fly-client-ip"]) clojure.string/trim)]
+        (if (or (= uri "/health") ;; Always public for Fly.io monitoring
+                (nil? allowed-ip)
                 (= allowed-ip client-ip))
           (handler request)
           (do
-            (println (str "❌ BLOCKED: IP mismatch. Expected: " allowed-ip " | Got: " client-ip))
+            (println (str "❌ BLOCKED: " uri " | Expected: " (or allowed-ip "N/A") " | Got: " (or client-ip "NONE")))
             {:status 403 :body "Forbidden: Unauthorized IP"}))))))
 
 (defn handler [request]

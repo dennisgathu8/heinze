@@ -13,16 +13,16 @@
 ;; -----------------------------------------------------------------------------
 
 (defn on-open [conn handshake]
-  (let [allowed-ip (System/getenv "ALLOWED_IP")
-        client-ip (.getFieldValue handshake "fly-client-ip")]
+  (let [allowed-ip (some-> (System/getenv "ALLOWED_IP") clojure.string/trim)
+        client-ip (some-> (.getFieldValue handshake "fly-client-ip") clojure.string/trim)]
     (if (or (nil? allowed-ip)
             (empty? client-ip)
             (= allowed-ip client-ip))
       (do
         (swap! clients conj conn)
-        (println (str "✅ WS OPEN: Authorized IP: " (or client-ip "local"))))
+        (println (str "✅ WS OPEN: " (or client-ip "local"))))
       (do
-        (println (str "❌ WS BLOCKED: IP mismatch. Expected: " allowed-ip " | Got: " client-ip))
+        (println (str "❌ WS BLOCKED: Expected: " allowed-ip " | Got: " client-ip))
         (.close conn 4003 "Unauthorized IP")))))
 
 (defn on-close [conn code reason remote]
