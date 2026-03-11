@@ -41,7 +41,7 @@
       (.send conn (pr-str {:status :error :message "Invalid EDN"})))))
 
 (defn create-server [port]
-  (proxy [WebSocketServer] [(InetSocketAddress. port)]
+  (proxy [WebSocketServer] [(InetSocketAddress. "0.0.0.0" port)]
     (onOpen [conn handshake] (on-open conn handshake))
     (onClose [conn code reason remote] (on-close conn code reason remote))
     (onMessage [conn message] (on-message conn message))

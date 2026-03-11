@@ -45,7 +45,7 @@
 (defn start-server! [port]
   (when @server-ref
     (.stop @server-ref))
-  (let [s (jetty/run-jetty app {:port port :join? false})]
+  (let [s (jetty/run-jetty app {:port port :host "0.0.0.0" :join? false})]
     (reset! server-ref s)
     s))
 
